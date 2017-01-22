@@ -1,19 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:twitter="http://www.mulesoft.org/schema/mule/twitter" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/twitter http://www.mulesoft.org/schema/mule/twitter/current/mule-twitter.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
     <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="8081" doc:name="HTTP Listener Configuration"/>
     <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="api.infojobs.net" port="443" doc:name="HTTP Request Configuration">
         <http:basic-authentication username="e55d6b11ef0a415eb708940d889cb8b8" password="wUvdXAwdJgNB/jgq1zxPCcjX8EMvgtsd8hnRL9ilrWwpK+oDZX"/>
     </http:request-config>
+    <twitter:config name="Twitter__Configuration" accessKey="295651084-yAjbxgL668MvpTVh86NbNzWt2h5mDTuBUpgYgKbR" accessSecret="9NPdoeKSrleMNfaZyYBJDZZaGbyVjGgHt8pW1liugiT66" consumerKey="d6YPcD6H1dNtmJ7NwycL6tULa" consumerSecret="MYNnuYnJRhXOgumkS5vU7NVJXafoS5uXUTuBRPPUSnhqPALZM8" doc:name="Twitter: Configuration"/>
     <flow name="jaimadgajobsFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
         <http:request config-ref="HTTP_Request_Configuration" path="api/1/offer" method="GET" doc:name="HTTP"/>
         <set-session-variable variableName="test" value="varuableprueba" doc:name="Session Variable"/>
         <custom-transformer class="com.jaimadga.JobsTransformer" doc:name="Java"/>
+    </flow>
+    <flow name="twitterFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
+        <twitter:search config-ref="Twitter__Configuration" locale="es" query="to:Google" resultType="popular" unit="km" doc:name="Twitter"/>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
     </flow>
 </mule>
