@@ -13,5 +13,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
     <flow name="jaimadgajobsFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
         <http:request config-ref="HTTP_Request_Configuration" path="api/1/offer" method="GET" doc:name="HTTP"/>
+        <set-session-variable variableName="test" value="varuableprueba" doc:name="Session Variable"/>
+        <custom-transformer class="com.jaimadga.JobsTransformer" doc:name="Java"/>
     </flow>
 </mule>
