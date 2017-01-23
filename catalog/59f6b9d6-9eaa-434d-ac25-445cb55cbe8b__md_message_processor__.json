@@ -1,0 +1,11 @@
+{
+    "inputMessageMetadata": {},
+    "outputMessageMetadata": {
+        "messagePayload": {
+            "connectorName": "#_custom_mule_metadata_type_#",
+            "typeId": "twitter"
+        }
+    },
+    "id": "59f6b9d6-9eaa-434d-ac25-445cb55cbe8b",
+    "version": "5.2.0.0"
+}

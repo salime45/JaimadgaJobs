@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:twitter="http://www.mulesoft.org/schema/mule/twitter" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:twitter="http://www.mulesoft.org/schema/mule/twitter" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
@@ -8,7 +8,8 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
 http://www.mulesoft.org/schema/mule/twitter http://www.mulesoft.org/schema/mule/twitter/current/mule-twitter.xsd
-http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
     
     <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="8081" doc:name="HTTP Listener Configuration"/>
     <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="api.infojobs.net" port="443" doc:name="HTTP Request Configuration">
@@ -20,11 +21,21 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
     <flow name="jaimadgajobsFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
         <http:request config-ref="HTTP_Request_Configuration" path="api/1/offer" method="GET" doc:name="HTTP"/>
-        <custom-transformer class="com.jaimadga.EnterprisesTransformer" doc:name="Java"/>
+        <custom-transformer class="com.jaimadga.EnterprisesTransformer" doc:name="Java" mimeType="application/csv"/>
         <foreach doc:name="For Each">
-        	<twitter:search config-ref="Twitter__Configuration" locale="es" query="to:Google" resultType="popular" unit="km" doc:name="Twitter"/>
+            <echo-component doc:name="Echo"/>
+            <twitter:search config-ref="Twitter__Configuration" query="#[payload]" doc:name="Twitter"/>
+            <dw:transform-message metadata:id="7ac73a5d-2fb9-41d3-ba7d-290db0600c13" doc:name="Transform Message">
+                <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	Autor: payload.tweets[0].user.name,
+	Tweet: payload.tweets[0].text
+}]]></dw:set-payload>
+            </dw:transform-message>
+            <echo-component doc:name="Echo"/>
         </foreach>
-        <custom-transformer class="com.jaimadga.JobsTransformer" doc:name="Java"/>
 
 
     </flow>
