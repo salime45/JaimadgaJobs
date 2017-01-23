@@ -14,15 +14,22 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
     <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="api.infojobs.net" port="443" doc:name="HTTP Request Configuration">
         <http:basic-authentication username="e55d6b11ef0a415eb708940d889cb8b8" password="wUvdXAwdJgNB/jgq1zxPCcjX8EMvgtsd8hnRL9ilrWwpK+oDZX"/>
     </http:request-config>
+    
+    <twitter:config name="Twitter__Configuration" accessKey="295651084-yAjbxgL668MvpTVh86NbNzWt2h5mDTuBUpgYgKbR" accessSecret="9NPdoeKSrleMNfaZyYBJDZZaGbyVjGgHt8pW1liugiT66" consumerKey="d6YPcD6H1dNtmJ7NwycL6tULa" consumerSecret="MYNnuYnJRhXOgumkS5vU7NVJXafoS5uXUTuBRPPUSnhqPALZM8" doc:name="Twitter: Configuration"/>
+    
     <flow name="jaimadgajobsFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
         <http:request config-ref="HTTP_Request_Configuration" path="api/1/offer" method="GET" doc:name="HTTP"/>
+        <custom-transformer class="com.jaimadga.EnterprisesTransformer" doc:name="Java"/>
+        <foreach doc:name="For Each">
+        	<twitter:search config-ref="Twitter__Configuration" locale="es" query="to:Google" resultType="popular" unit="km" doc:name="Twitter"/>
+        </foreach>
         <custom-transformer class="com.jaimadga.JobsTransformer" doc:name="Java"/>
+
 
     </flow>
     
      <!--    
-     <twitter:config name="Twitter__Configuration" accessKey="295651084-yAjbxgL668MvpTVh86NbNzWt2h5mDTuBUpgYgKbR" accessSecret="9NPdoeKSrleMNfaZyYBJDZZaGbyVjGgHt8pW1liugiT66" consumerKey="d6YPcD6H1dNtmJ7NwycL6tULa" consumerSecret="MYNnuYnJRhXOgumkS5vU7NVJXafoS5uXUTuBRPPUSnhqPALZM8" doc:name="Twitter: Configuration"/>
 
     <flow name="twitterFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/" doc:name="HTTP"/>
